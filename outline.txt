@@ -1,0 +1,50 @@
+synchronous:
+
+  static:
+- exists_all
+- is_child(@cpid, ppid)
+	if process_table, queries it
+	else queries manually
+	checks starttimes
+
+  instance:
+
+- create & ||= fork()
+	blocks all sigs, calls &, returns in child, calls new in parent, unblocks in both
+	hooks for FastSpawn
+- new  ( childwatch y/n )
+	reads starttime into uid, -> global
+	optionally sets up child watcher
+- _child_watcher:
+	- signal tx
+	- exists{skip kill 0} && waitpid
+- _maybeloadProcess::Table
+- reaped_by -> CHLD or other
+- kill $SIG: identity-safe version of kill; wraps in signal blocken
+- setup_child_watcher
+	maybe uses SigAction? Or XSIG? falls back to default SIG
+- finish( fatal y/n, timeout )
+- exists: local state -> kill 0 -> is_child(self.pid)
+- DESTROY ( finish(n, 0), but warns/logs )
+
+
+async:
+- @_maybeloadProcess::Table -> 0
+
+
+Extension modules:
+- BSD::Process ( read )
+- ProcessTable ( read )
+- Async::Interrupt??
+- Proc::Wait3 ( returns add'l info )
+- Proc::FastSpawn
+- Silly kill-0 wrapper?
+
+Should use this:
+- AnyEvent::Process
+- AnyEvent::Proc
+- AnyEvent::Fork/etc (linked)
+- IO::Async::process
+
+Misc/improve:
+SafeFork
